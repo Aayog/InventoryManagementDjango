@@ -125,4 +125,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_HOST_USER ="rudahabmar@gmail.com"
-EMAIL_HOST_PASSWORD ="2UbEYyZk7bUnHfX"
+EMAIL_HOST_PASSWORD =""
