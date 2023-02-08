@@ -48,8 +48,10 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     cost_price = models.FloatField() #price bought from the vendor (price before profit)
     price = models.FloatField() #price it was sold at
+    stock_threshold = models.PositiveIntegerField(default=3)
     def __str__(self) -> str:
         return self.name
+    
 
 class Order(models.Model):
     choices = [
