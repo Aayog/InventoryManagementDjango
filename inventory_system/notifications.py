@@ -6,7 +6,7 @@ from django.conf import settings
 from .models import Product
 
 @receiver(post_save, sender=Product)
-def check_inventory_and_send_email()(sender, instance, **kwargs):
+def check_inventory_and_send_email(sender, instance, **kwargs):
     print("Called check inventory",end="\n\n")
     # Check inventory levels
     if instance.stock < instance.stock_threshold:
