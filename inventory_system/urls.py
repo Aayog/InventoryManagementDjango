@@ -9,5 +9,7 @@ router.register(r'vendors', VendorViewSet)
 router.register(r'customers', CustomerViewSet)
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),    
+    # path('jet/', include('jet.urls', 'jet')),
+    # path('jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
 ]

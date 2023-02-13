@@ -8,6 +8,10 @@ class Category(models.Model):
     
     def __str__(self) -> str:
         return self.name
+    
+    def __unicode__(self):
+        return self.name
+        
 
 class Address(models.Model):
     street_address = models.CharField(max_length=100)
@@ -19,6 +23,14 @@ class Address(models.Model):
     def __str__(self) -> str:
         return f'{self.street_address}, {self.district}'
     
+    def __unicode__(self):
+        return f'{self.street_address}, {self.district}'
+        
+    
+    @staticmethod
+    def autocomplete_search_fields():
+        return 'name', 'district'
+
     class Meta:
         verbose_name_plural = "Addresses"
 
@@ -29,6 +41,13 @@ class Vendor(models.Model):
 
     def __str__(self) -> str:
         return self.name
+    
+    def __unicode__(self):
+        return self.name
+        
+# TODO custom user models
+# custm login/signup through email verication (login only if verified)
+
 
 class Customer(models.Model):
     phone_num = models.CharField(max_length=20)
@@ -39,6 +58,10 @@ class Customer(models.Model):
 
     def __str__(self) -> str:
         return f'{self.first_name}'
+    
+    def __unicode__(self):
+        return f'{self.first_name}'
+        
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
@@ -52,6 +75,7 @@ class Product(models.Model):
     def __str__(self) -> str:
         return self.name
     
+# in save method: once order placed decrease stock/quantity
 
 class Order(models.Model):
     choices = [
@@ -64,7 +88,7 @@ class Order(models.Model):
     products = models.ManyToManyField(Product, through='OrderProduct')
     status = models.CharField(choices=choices, max_length=10)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    total_price = models.FloatField()
+    total_price = models.FloatField() #Decimal field
     shipping_address = models.CharField(max_length=255)
     date_ordered = models.DateTimeField(auto_now_add=True)
     def __str__(self) -> str:
