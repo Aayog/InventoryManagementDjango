@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-jbthssekimqd7io1vopp(pi-h37#rr^y5)!9&1ph9j2l!iq9t0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "0.0.0.0"]
+ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0"]
 
 
 # Application definition
@@ -55,12 +55,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend',]
+
 ROOT_URLCONF = 'inventory_management.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -105,6 +107,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'inventory_system.Customer'
+AUTHENTICATION_BACKENDS = ['inventory_system.email_authentication.EmailBackend']
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -131,7 +135,6 @@ DEFAULT_FROM_EMAIL = 'rudahabmar@gmail.com'
 NOTIFICATION_EMAIL = 'aayog.koirala@youthinnovationlab.org'
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_HOST_PASSWORD = ""
-# EMAIL_HOST_PASSWORD = ""
 EMAIL_HOST_USER = "rudahabmar@gmail.com"
 EMAIL_PORT = 587
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
