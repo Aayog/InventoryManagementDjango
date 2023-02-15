@@ -1,6 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, UserManager
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail, EmailMessage
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect
+from .tokens import account_activation_token
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -47,31 +58,36 @@ class Vendor(models.Model):
         return self.name
         
 # custm login/signup through email verication (login only if verified)
-
 class CustomUserManager(UserManager):
     def create_user(self, email, password, **extra_fields):
         if not email:
-            raise ValueError(_('Users must have an email address'))
+            raise ValueError(('Users must have an email address'))
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
+        print(user)
         user.set_password(password)
-        user.save()
         user.is_active = False
-        current_site = get_current_site(request)
-        subject = 'Activate Your MySite Account'
+        
+        #token and uidb64
+        token = account_activation_token.make_token(user)
+        uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+        subject = 'Activate Your Inventory Management Account'
         message = render_to_string('account_activation_email.html', {
             'user': user,
-            'domain': current_site.domain,
+            'domain': '127.0.0.1',# current_site.domain,
             'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-            'token': account_activation_token.make_token(user),
+            # 'token': account_activation_tokeaccount_activation_token.make_token(user)n.make_token(user),
+            'activation_link': f'http://127.0.0.1:9000/activate/{uidb64}/{token}'
         })
         user.email_user(subject, message)
+        
+        user.save()
         return HttpResponse('Please confirm your email address to complete the registration')
-        return user
+        # return user
+
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
-
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save()
@@ -102,6 +118,12 @@ class Customer(AbstractBaseUser):
     def set_is_superuser(self, value):
         self.is_superuser = value
         self.save()
+
+    def email_user(self, subject, message, from_email=None, **kwargs):
+        email = EmailMessage(subject, message, to=[self.email])
+        email.content_subtype = "html"
+        email.send()
+        # send_mail(subject, message, from_email, [self.email], **kwargs)
 
     def __str__(self) -> str:
         return f'{self.first_name} {self.last_name}'
